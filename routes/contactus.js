@@ -1,16 +1,10 @@
 const express = require('express');
-const path = require('path');
-const rootDir = require('../util/path');
-
+const contactusController = require('../controllers/contactus');
 
 const router = express.Router();
 
-router.get('/contactus', (req, res) => {
-    res.sendFile(path.join(rootDir, 'views', 'contactus.html'))
-})
+router.get('/contactus', contactusController.showContactForm)
 
-router.post('/success', (req, res) => {
-    res.send("<h1>Form successfuly filled</h1>");
-})
+router.post('/success', contactusController.success)
 
 module.exports = router;
