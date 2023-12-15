@@ -8,7 +8,13 @@ exports.showProducts = (req, res) => {
         console.log(products);
         res.sendFile(path.join(rootDir , 'views', 'shop.html'))
     });
-    
+}
+exports.handleDynamicRoute = (req, res) => {
+    const prodId = req.params.productId;
+    Product.findById(prodId, product =>{
+        console.log(product);
+    })
+    res.redirect('/')
 }
 
 exports.addProcuts = (req, res) => {
