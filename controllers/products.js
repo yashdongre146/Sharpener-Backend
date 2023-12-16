@@ -1,6 +1,7 @@
 const path = require('path');
 const rootDir = require('../util/path');
 const Product = require('../models/product');
+const Cart = require('../models/cart');
 
 
 exports.showProducts = (req, res) => {
@@ -23,5 +24,12 @@ exports.addProcuts = (req, res) => {
 exports.productAdded = (req, res) => {
     const product = new Product(req.body.title);
     product.save();
+    res.redirect('/');
+}
+exports.postCart = (req, res) => {
+    const prodId = req.body.productId;
+    Product.findById(prodId, (product)=>{
+        Cart.addProduct(prodId, product.price)
+    })
     res.redirect('/');
 }

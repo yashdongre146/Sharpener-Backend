@@ -20,6 +20,7 @@ module.exports = class Product {
 
   save() {
     this.id = Math.random().toString();
+    this.price = Math.floor(Math.random() * 100) + 1;
     getProductsFromFile((products)=>{// when this callback resolves then
       products.push(this); // this code will execute
       fs.writeFile(p, JSON.stringify(products), err => console.log(err))
