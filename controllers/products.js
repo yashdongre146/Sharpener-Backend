@@ -34,6 +34,10 @@ exports.postEditProduct = (req, res) => {
     updatedProduct.save();
     res.redirect("/")
 }
+exports.deleteProduct = (req, res) => {
+    Product.deleteProduct(req.params.productId);
+    res.redirect('/')
+}
 exports.productAdded = (req, res) => {
     const product = new Product(null, req.body.title);
     product.save();
