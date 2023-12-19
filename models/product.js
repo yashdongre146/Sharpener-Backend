@@ -1,25 +1,45 @@
-const db = require('../util/database')
+const Sequelize = require('sequelize');
+const sequelize = require('../util/database');
+
+const Product = sequelize.define('product', {
+  id: {
+    type: Sequelize.INTEGER,
+    autoIncrement: true,
+    allowNull: false,
+    primaryKey: true
+  },
+  title: Sequelize.STRING,
+  price: {
+    type: Sequelize.DOUBLE,
+    allowNull: false
+  }
+})
+
+module.exports = Product;
 
 
-module.exports = class Product {
-  constructor(title) {
-    this.title = title;
-    this.price = Math.floor(Math.random() * 100) + 1;
-  }
-  save() {
-    return db.execute('INSERT INTO products (title, price) VALUES (?, ?)',
-    [this.title, this.price])
-  }
-  static fetchAll() {
-    return db.execute('SELECT * FROM products')
-  }
-  static findById(id) {
-    return db.execute('SELECT * FROM products WHERE products.id = ?', [id]);
-  }
-  static deleteProduct(id) {
-    db.execute('DELETE FROM products where products.id = ?', [id])
-  }
-};
+// const db = require('../util/database')
+
+
+// module.exports = class Product {
+//   constructor(title) {
+//     this.title = title;
+//     this.price = Math.floor(Math.random() * 100) + 1;
+//   }
+//   save() {
+//     return db.execute('INSERT INTO products (title, price) VALUES (?, ?)',
+//     [this.title, this.price])
+//   }
+//   static fetchAll() {
+//     return db.execute('SELECT * FROM products')
+//   }
+//   static findById(id) {
+//     return db.execute('SELECT * FROM products WHERE products.id = ?', [id]);
+//   }
+//   static deleteProduct(id) {
+//     db.execute('DELETE FROM products where products.id = ?', [id])
+//   }
+// };
 
 
 // const path = require('path');

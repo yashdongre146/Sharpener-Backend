@@ -5,15 +5,14 @@ const Cart = require('../models/cart');
 
 
 exports.showProducts = (req, res) => {
-    Product.fetchAll().then(([row, col])=>{
-        console.log(row)
+    Product.findAll().then((products)=>{
         res.sendFile(path.join(rootDir , 'views', 'shop.html'))
     }).catch((err)=>{console.log(err);})
 }
 exports.handleDynamicRoute = (req, res) => {
     const prodId = req.params.productId;
-    Product.findById(prodId).then(([product])=>{
-        console.log(product[0]);
+    Product.findByPk(prodId).then((product)=>{
+        console.log(product);
         res.redirect('/')
     })
 }
@@ -29,24 +28,30 @@ exports.editProduct = (req, res) => {
 }
 exports.postEditProduct = (req, res) => {
     const updatedTitle = req.body.title;
-    const updatedProduct = new Product(updatedTitle);
-    updatedProduct.save().then(()=>{
-        res.redirect('/');
-    });
+    Product.findByPk(req.body.productId).then(product=>{
+        product.title = updatedTitle;
+        product.price = Math.floor(Math.random() * 100) + 1;
+        return product.save();
+    }).then(()=>{
+        res.redirect('/')
+    }
+    ).catch(err=>console.log(err))
 }
 exports.deleteProduct = (req, res) => {
-    Product.deleteProduct(req.params.productId);
+    Product.destroy({where: {id: req.params.productId}});
     res.redirect('/')
 }
 exports.productAdded = (req, res) => {
-    const product = new Product(req.body.title);
-    product.save().then(()=>{
+    Product.create({
+        title: req.body.title,
+        price: Math.floor(Math.random() * 100) + 1
+    }).then(()=>{
         res.redirect('/');
-    });
+    }).catch(err=>console.log(err))    
 }
 exports.postCart = (req, res) => {
     const prodId = req.body.productId;
-    Product.findById(prodId).then(()=>{
+    Product.findByPk(prodId).then((product)=>{
         Cart.addProduct(prodId, product.price)
         res.redirect('/');
     })
