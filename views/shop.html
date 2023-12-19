@@ -25,15 +25,19 @@
         <p>List of all the products...</p>
         <form action="/cart" method="POST">
             <button type="submit">Add to Cart</button>
-            <input type="hidden" name="productId" value="0.6162091795298998">
+            <input type="hidden" name="productId" value="2">
         </form>
-        <form action="/admin/edit-product/0.6162091795298998?edit=true" method="POST">
+        <form action="/products/2" method="POST">
+            <button type="submit">Details</button>
+            <input type="hidden" name="productId" value="2">
+        </form>
+        <form action="/admin/edit-product/2?edit=true" method="POST">
             <button type="submit">Edit</button>
-            <input type="hidden" name="productId" value="0.6162091795298998">
+            <input type="hidden" name="productId" value="2">
         </form>
-        <form action="/admin/delete-product/0.6162091795298998" method="POST">
+        <form action="/admin/delete-product/2" method="POST">
             <button type="submit">Delete</button>
-            <input type="hidden" name="productId" value="0.6162091795298998">
+            <input type="hidden" name="productId" value="2">
         </form>
     </main>
 </body>

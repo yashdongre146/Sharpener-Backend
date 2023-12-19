@@ -6,7 +6,6 @@ const shopRoutes = require('./routes/shop');
 const contactRoute = require('./routes/contactus');
 const errorController = require('./controllers/error');
 
-
 const app = express();
 
 app.use(bodyParser.urlencoded({extended: false}))

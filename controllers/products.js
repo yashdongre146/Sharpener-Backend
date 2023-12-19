@@ -5,17 +5,17 @@ const Cart = require('../models/cart');
 
 
 exports.showProducts = (req, res) => {
-    Product.fetchAll(products=>{
-        console.log(products);
+    Product.fetchAll().then(([row, col])=>{
+        console.log(row)
         res.sendFile(path.join(rootDir , 'views', 'shop.html'))
-    });
+    }).catch((err)=>{console.log(err);})
 }
 exports.handleDynamicRoute = (req, res) => {
     const prodId = req.params.productId;
-    Product.findById(prodId, product =>{
-        console.log(product);
+    Product.findById(prodId).then(([product])=>{
+        console.log(product[0]);
+        res.redirect('/')
     })
-    res.redirect('/')
 }
 
 exports.addProcuts = (req, res) => {
@@ -28,25 +28,26 @@ exports.editProduct = (req, res) => {
     }
 }
 exports.postEditProduct = (req, res) => {
-    const prodId = req.body.productId;
     const updatedTitle = req.body.title;
-    const updatedProduct = new Product(prodId, updatedTitle);
-    updatedProduct.save();
-    res.redirect("/")
+    const updatedProduct = new Product(updatedTitle);
+    updatedProduct.save().then(()=>{
+        res.redirect('/');
+    });
 }
 exports.deleteProduct = (req, res) => {
     Product.deleteProduct(req.params.productId);
     res.redirect('/')
 }
 exports.productAdded = (req, res) => {
-    const product = new Product(null, req.body.title);
-    product.save();
-    res.redirect('/');
+    const product = new Product(req.body.title);
+    product.save().then(()=>{
+        res.redirect('/');
+    });
 }
 exports.postCart = (req, res) => {
     const prodId = req.body.productId;
-    Product.findById(prodId, (product)=>{
+    Product.findById(prodId).then(()=>{
         Cart.addProduct(prodId, product.price)
+        res.redirect('/');
     })
-    res.redirect('/');
 }
