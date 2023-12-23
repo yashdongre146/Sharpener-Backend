@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Message Form</title>
+</head>
+<body>
+  <form action="/submit-message/{{username}}" method="POST">
+    {{#if message}}{{message}}{{else}}No Chat Exists!{{/if}}
+    <br>
+    <br>
+    <label for="message">Enter Message:</label>
+    <input type="text" id="message" name="message">
+    <button type="submit">Submit</button>
+  </form>
+</body>
+</html>

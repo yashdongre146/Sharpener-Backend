@@ -1,13 +1,35 @@
 const express = require('express');
-const productsController = require('../controllers/products');
+const fs = require('fs');
 
 const router = express.Router();
 
-router.use("/add-product", productsController.addProcuts)
+router.get("/", (req, res)=>{
+    res.render('index')
+})
+router.use("/submit-username", (req, res)=>{
+    const username = req.body.username;
+    fs.readFile('./data/message.txt', 'utf-8', (err, message)=>{
+        if (err) {
+            console.log(err);
+            return res.status(500).send('Error reading message');
+        }
 
-router.post("/product", productsController.productAdded)
-router.post("/edit-product/:productId", productsController.editProduct)
-router.post("/edit-product", productsController.postEditProduct)
-router.post("/delete-product/:productId", productsController.deleteProduct)
+        res.render('message', { username, message});
+    })
+})
+router.post("/submit-message/:username", (req, res)=>{
+    const username = req.params.username;
+    const message = req.body.message;
+    const data = `${username}: ${message}`
+
+    fs.appendFile('./data/message.txt', data, (err) => {
+        if (err) {
+          console.error('Error appending to file:', err);
+        }
+        else{
+            res.redirect('/submit-username');
+        }
+      })
+})
 
 module.exports = router;

@@ -1,26 +1,21 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const path = require('path');
 const adminRoutes = require('./routes/admin');
-const shopRoutes = require('./routes/shop');
-const contactRoute = require('./routes/contactus');
-const errorController = require('./controllers/error');
-const sequelize = require('./util/database');
+const path = require('path');
 
 const app = express();
 
+app.set('view engine', 'hbs')
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(express.static(path.join(__dirname, 'public')))
 
-app.use('/admin', adminRoutes);
-app.use(shopRoutes);
-app.use(contactRoute);
+app.use(adminRoutes);
 
-app.use("/", errorController.get404)
+app.use("/", (req, res)=>{
+    res.send("<h1>Page Not Exists</h1>")
+})
 
-sequelize.sync().then(()=>{
-    app.listen(4000);
-}).catch(err => console.log(err))
+app.listen(4000);
 
 
 
