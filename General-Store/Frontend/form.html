@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body class="bg-img">
+    <div >
+        <form onsubmit="saveToDatabase()" method="POST">
+            <div>
+                <hr>
+                <div >
+                    <input type="text" id="iname" name="itemname" autocomplete="on" placeholder="Item Name Here"
+                     > <br>
+                    <label for="iname"><b>Item Name:</b></label><br>
+                </div>
+                <br>
+                <label for="description"><b>Description:</b></label><br>
+                <input type="text" id="description" name="description" autocomplete="on" 
+                    placeholder="description"><br>
+
+                <br>
+                <label for="price" ><b>Price:</b></label><br>
+                <input type="number" id="price" name="price" autocomplete="on" 
+                    placeholder="price">
+
+                <label for="quantity" ><b>Quantity:</b></label><br>
+                <input type="number" id="quantity" name="quantity" autocomplete="on" 
+                    placeholder="quantity">
+
+                <div >
+                    <button type="submit" id="addItem" >Add Item</button>
+                </div>
+            </div>
+        </form>
+        <hr>
+    </div>
+</body>
+<script src="dataToCloud.js"></script>
+
+</html>
