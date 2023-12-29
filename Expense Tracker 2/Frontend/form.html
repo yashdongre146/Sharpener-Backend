@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Expense Tracker 2</title>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
+
 <body>
-    <form onsubmit="saveToDatabase(event)">
+    <form onsubmit="saveToDatabase(event)" id="signupForm" style="display: none;">
         <label for="name">Name :</label>
         <input type="text" name="name" id="name">
         <label for="email">Email :</label>
@@ -16,6 +18,16 @@
         <input type="password" name="password" id="password">
         <button type="submit">Signup</button>
     </form>
+
+    <!-- Login form initially hidden -->
+    <form id="loginForm"  onsubmit="checkLogin(event)">
+        <!-- Your login form fields (username, password) -->
+        <!-- Example: -->
+        <input type="text" id="login-email" placeholder="Email">
+        <input type="password" id="login-password" placeholder="Password">
+        <button type="submit">Login</button>
+    </form>
     <script src="dataToCloud.js"></script>
 </body>
+
 </html>
