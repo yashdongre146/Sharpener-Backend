@@ -4,7 +4,7 @@ const password = document.getElementById('password');
 const loginEmail = document.getElementById('login-email');
 const loginPassword = document.getElementById('login-password');
 
-function saveToDatabase(e) {
+function signup(e) {
     e.preventDefault();
     const userDetails = {
         name: name.value,
@@ -12,11 +12,9 @@ function saveToDatabase(e) {
         password: password.value
     };
 
-    axios.post('http://localhost:3000/addUser', userDetails)
+    axios.post('http://localhost:3000/signup', userDetails)
         .then((res) => {
-            // Handle success if needed (when HTTP status is not an error)
-            document.getElementById('signupForm').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'block';
+            window.location.href = 'login.html';
         })
         .catch((err) => {
             if (err) {
@@ -24,11 +22,12 @@ function saveToDatabase(e) {
             }
         });
 }
-function checkLogin(e) {
+function login(e) {
     e.preventDefault();
-    axios.get(`http://localhost:3000/checkUser/${loginEmail.value}/${loginPassword.value}`)
+    axios.get(`http://localhost:3000/login/${loginEmail.value}/${loginPassword.value}`)
         .then((res) => {
                 alert(`Welcome ${res.data[0].name}`);
+                window.location.href = 'expense.html';
         }).catch((err)=>{
             if(err){
                 alert("Invalid credentials")

@@ -1,7 +1,7 @@
 const User = require('../models/user')
 const bcryptjs = require('bcryptjs')
 
-exports.addUser =  (req, res) => {
+exports.signup =  (req, res) => {
    try {
         const {name, email, password} = req.body;
         bcryptjs.hash(password, 10, async (err, hash)=>{
@@ -12,7 +12,7 @@ exports.addUser =  (req, res) => {
             res.status(400).json();
     }
 }
-exports.checkUser = (req, res) => {
+exports.login = (req, res) => {
     User.findAll({where: {email : req.params.emailId}}).then((user)=>{
         if (user.length > 0) {
             bcryptjs.compare(req.params.password, user[0].dataValues.password, (err, resp)=>{
