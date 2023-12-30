@@ -9,7 +9,7 @@
 </head>
 
 <body>
-    <form onsubmit="saveToDatabase(event)" id="signupForm" style="display: none;">
+    <form onsubmit="saveToDatabase(event)" id="signupForm">
         <label for="name">Name :</label>
         <input type="text" name="name" id="name">
         <label for="email">Email :</label>
@@ -20,7 +20,7 @@
     </form>
 
     <!-- Login form initially hidden -->
-    <form id="loginForm"  onsubmit="checkLogin(event)">
+    <form id="loginForm"  onsubmit="checkLogin(event)"  style="display: none;">
         <!-- Your login form fields (username, password) -->
         <!-- Example: -->
         <input type="text" id="login-email" placeholder="Email">
