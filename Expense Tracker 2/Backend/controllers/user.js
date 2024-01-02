@@ -1,6 +1,11 @@
 const User = require('../models/user')
 const bcryptjs = require('bcryptjs')
+const jwt = require('jsonwebtoken');
 
+
+function generateToken(id){
+    return jwt.sign(id, 'secretKey')
+}
 exports.signup =  (req, res) => {
    try {
         const {name, email, password} = req.body;
@@ -13,11 +18,11 @@ exports.signup =  (req, res) => {
     }
 }
 exports.login = (req, res) => {
-    User.findAll({where: {email : req.params.emailId}}).then((user)=>{
+    User.findAll({where: {email : req.body.email}}).then((user)=>{
         if (user.length > 0) {
-            bcryptjs.compare(req.params.password, user[0].dataValues.password, (err, resp)=>{
+            bcryptjs.compare(req.body.password, user[0].password, (err, resp)=>{
                 if (!err) {
-                    res.json(user);
+                    res.json({token: generateToken(user[0].id)});
                 } else {
                     res.status(401).json();
                 }

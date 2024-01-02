@@ -3,9 +3,10 @@ const chooseDescription = document.getElementById('choosedescription');
 const selectCategory = document.getElementById('selectcategory');
 const form = document.getElementById('form');
 const items = document.getElementById('items');
+const token = localStorage.getItem('token');
 
 window.addEventListener('DOMContentLoaded', () => {
-    axios.get('http://localhost:3000/getExpense').then((expenses)=>{
+    axios.get('http://localhost:3000/getExpense', {headers: {'auth': token}}).then((expenses)=>{
         for (let i = 0; i < expenses.data.length; i++) {
             showUserOnScreen(expenses.data[i]);
         }
@@ -20,7 +21,7 @@ function addExpense(e){
         category: selectCategory.value
     }
 
-    axios.post('http://localhost:3000/addExpense', expense).then((expense)=>{
+    axios.post('http://localhost:3000/addExpense', expense, {headers: {'auth': token}}).then((expense)=>{
         alert("Successfully added.");
         location.reload('/')
     })
@@ -29,6 +30,7 @@ function addExpense(e){
 function deleteExpense(expenseId) {
     axios.delete(`http://localhost:3000/deleteExpense/${expenseId}`).then((res)=>{
         alert("Expense deleted")
+        location.reload('/')
     })
 }
 

@@ -24,9 +24,15 @@ function signup(e) {
 }
 function login(e) {
     e.preventDefault();
-    axios.get(`http://localhost:3000/login/${loginEmail.value}/${loginPassword.value}`)
+
+    const loginDetails = {
+        email: loginEmail.value,
+        password: loginPassword.value
+    }
+    axios.post(`http://localhost:3000/login`, loginDetails)
         .then((res) => {
-                alert(`Welcome ${res.data[0].name}`);
+                console.log(res.data.token);
+                localStorage.setItem('token', res.data.token)
                 window.location.href = 'expense.html';
         }).catch((err)=>{
             if(err){
