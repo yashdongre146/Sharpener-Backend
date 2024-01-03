@@ -54,3 +54,31 @@ function showUserOnScreen(expense){
         ul.remove(li);
     }
 }
+
+document.getElementById('rzp-button').addEventListener('click', ()=>{
+    axios.get('http://localhost:3000/purchase', {headers: {"auth": token}})
+    .then((res)=>{
+        var options = {
+            "key": res.data.key_id,
+            "order_id": res.data.order.id,
+            "handler": async function(res){
+                await axios.post('http://localhost:3000/updateTransactionStatus', {
+                    order_id: options.order_id,
+                    payment_id: res.razorpay_payment_id
+                }, {headers: {"auth": token}})
+
+                alert("Congrats! you are a premium member now.")
+                document.getElementById('rzp-button').style.display = "none"
+            }
+        }
+
+        const rzp1 = new Razorpay(options);
+        rzp1.open();
+        e.preventDefault();
+
+        rzp1.on('payment.faild', function(res){
+            console.log(res);
+            alert("something went wrong");
+        })
+    })
+})
