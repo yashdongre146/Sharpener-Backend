@@ -105,7 +105,7 @@ document.getElementById('showLeaderboard').addEventListener('click', ()=>{
             const ul = document.getElementById('leaderboard');
             const li = document.createElement('li');
 
-            li.appendChild(document.createTextNode(`Name ${result.name}, Total Expense ${result.totalAmountSpent}`));
+            li.appendChild(document.createTextNode(`Name ${result.name}, Total Expense ${result.totalAmount}`));
 
             ul.appendChild(li);
         })

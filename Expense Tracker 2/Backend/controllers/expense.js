@@ -9,7 +9,13 @@ exports.addExpense = (req, res) => {
     description: description,
     category: category,
     userId: req.user.id,
-  }).then((expense) => res.json(expense));
+  }).then((expense) => {
+    User.findByPk(req.user.id).then((user)=>{
+      const updatedAmount = user.dataValues.totalAmount+= amount;
+      req.user.update({totalAmount: updatedAmount})
+    })
+    res.json(expense)
+  });
 };
 
 exports.getExpense = (req, res) => {
@@ -53,21 +59,25 @@ Promise.all([Expense.findAll(), User.findAll()]).then(([expenses, users]) => {
     });
 
 */
-  const result = await User.findAll({
-    attributes: [
-      "id",
-      "name",
-      [sequelize.fn("sum", sequelize.col("amount")), "totalAmountSpent"],
-    ],
-    include: [
-      {
-        model: Expense,
-        attributes: [],
-      },
-    ],
-    group: ["id"],
-    order: [["totalAmountSpent", "DESC"]],
-  });
+  // const result = await User.findAll({
+  //   attributes: [
+  //     "id",
+  //     "name",
+  //     [sequelize.fn("sum", sequelize.col("amount")), "totalAmountSpent"],
+  //   ],
+  //   include: [
+  //     {
+  //       model: Expense,
+  //       attributes: [],
+  //     },
+  //   ],
+  //   group: ["id"],
+  //   order: [["totalAmountSpent", "DESC"]],
+  // });
 
-  res.json(result);
+  // res.json(result);
+
+  User.findAll().then((users)=>{
+    res.json(users)
+  })
 };
