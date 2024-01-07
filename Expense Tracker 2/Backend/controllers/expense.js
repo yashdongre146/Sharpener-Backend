@@ -1,54 +1,32 @@
-const Expense = require("../models/expense")
-const User = require("../models/user")
+const Expense = require("../models/expense");
+const User = require("../models/user");
+const sequelize = require("../util/database");
 
 exports.addExpense = (req, res) => {
-    const {amount, description, category} = req.body;
-    Expense.create({
-        amount: amount,
-        description: description,
-        category: category,
-        userId: req.user.id
-    }).then(expense=>res.json(expense))
-}
+  const { amount, description, category } = req.body;
+  Expense.create({
+    amount: amount,
+    description: description,
+    category: category,
+    userId: req.user.id,
+  }).then((expense) => res.json(expense));
+};
 
 exports.getExpense = (req, res) => {
-    Expense.findAll({where: {userId: req.user.id}}).then(expenses=>{
-        res.json(expenses)
-    })
-}
+  Expense.findAll({ where: { userId: req.user.id } }).then((expenses) => {
+    res.json(expenses);
+  });
+};
 
 exports.deleteExpense = (req, res) => {
-    Expense.destroy({where: {id: req.params.expenseId}}).then(()=>{
-        res.json();
-    })
-}
-exports.showLeaderboard = (req, res) => {
-    // Expense.findAll().then((expenses) => {
-    //     const totalAmounts = {};
-    
-    //     expenses.forEach((expense) => {
-    //         const userId = expense.dataValues.userId;
-    //         const amount = expense.dataValues.amount;
-    
-    //         if (!totalAmounts[userId]) {
-    //             totalAmounts[userId] = amount;
-    //         } else {
-    //             totalAmounts[userId] += amount;
-    //         }
-    //     });
-    
-    //     console.log("Total amount spent by different IDs:", totalAmounts);
-    //     for (const userId in totalAmounts) {
-    //         console.log(`User ID ${userId}: Total amount spent - ${totalAmounts[userId]}`);
-    //     }
+  Expense.destroy({ where: { id: req.params.expenseId } }).then(() => {
+    res.json();
+  });
+};
+exports.showLeaderboard = async (req, res) => {
+  /*    
 
-    //     User.findAll().then((users)=>{
-    //         console.log(users);
-    //     })
-    // });
-    
-    // First, retrieve the expenses and users
-    Promise.all([Expense.findAll(), User.findAll()]).then(([expenses, users]) => {
+Promise.all([Expense.findAll(), User.findAll()]).then(([expenses, users]) => {
         const totalAmounts = {};
 
         // Calculate total amounts spent by each user
@@ -74,4 +52,22 @@ exports.showLeaderboard = (req, res) => {
         res.json(result); // Display the ultimate result
     });
 
-}
+*/
+  const result = await User.findAll({
+    attributes: [
+      "id",
+      "name",
+      [sequelize.fn("sum", sequelize.col("amount")), "totalAmountSpent"],
+    ],
+    include: [
+      {
+        model: Expense,
+        attributes: [],
+      },
+    ],
+    group: ["id"],
+    order: [["totalAmountSpent", "DESC"]],
+  });
+
+  res.json(result);
+};
