@@ -3,8 +3,8 @@ const jwt = require('jsonwebtoken');
 
 const auth = (req, res, next) => {
     const token = req.header('auth');
-    const id = jwt.verify(token, 'secretKey');
-    User.findByPk(id).then((user)=>{
+    const user = jwt.verify(token, 'secretKey');
+    User.findByPk(user.id).then((user)=>{
         req.user = user;
         next();
     })

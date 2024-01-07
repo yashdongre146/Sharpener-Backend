@@ -22,3 +22,56 @@ exports.deleteExpense = (req, res) => {
         res.json();
     })
 }
+exports.showLeaderboard = (req, res) => {
+    // Expense.findAll().then((expenses) => {
+    //     const totalAmounts = {};
+    
+    //     expenses.forEach((expense) => {
+    //         const userId = expense.dataValues.userId;
+    //         const amount = expense.dataValues.amount;
+    
+    //         if (!totalAmounts[userId]) {
+    //             totalAmounts[userId] = amount;
+    //         } else {
+    //             totalAmounts[userId] += amount;
+    //         }
+    //     });
+    
+    //     console.log("Total amount spent by different IDs:", totalAmounts);
+    //     for (const userId in totalAmounts) {
+    //         console.log(`User ID ${userId}: Total amount spent - ${totalAmounts[userId]}`);
+    //     }
+
+    //     User.findAll().then((users)=>{
+    //         console.log(users);
+    //     })
+    // });
+    
+    // First, retrieve the expenses and users
+    Promise.all([Expense.findAll(), User.findAll()]).then(([expenses, users]) => {
+        const totalAmounts = {};
+
+        // Calculate total amounts spent by each user
+        expenses.forEach((expense) => {
+            const userId = expense.dataValues.userId;
+            const amount = expense.dataValues.amount;
+
+            if (!totalAmounts[userId]) {
+                totalAmounts[userId] = amount;
+            } else {
+                totalAmounts[userId] += amount;
+            }
+        });
+
+        // Create an array of objects combining user data with total amount spent
+        const result = users.map((user) => ({
+            id: user.dataValues.id,
+            name: user.dataValues.name,
+            totalAmountSpent: totalAmounts[user.dataValues.id] || 0 // Use the total amount or 0 if not found
+            // Here, you'd typically use totalAmounts[user.id] but considering your data structure, it might need adjustment based on your actual data
+        }));
+
+        res.json(result); // Display the ultimate result
+    });
+
+}

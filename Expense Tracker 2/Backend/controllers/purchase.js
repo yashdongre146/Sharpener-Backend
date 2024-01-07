@@ -1,5 +1,6 @@
 const Razorpay = require('razorpay');
 const Order = require('../models/order');
+const userController = require('./user');
 
 exports.purchase = (req, res) => {
     var rzp = new Razorpay({
@@ -9,9 +10,9 @@ exports.purchase = (req, res) => {
     const amount = 2500;
 
     rzp.orders.create({amount, currency: 'INR'}, (err, order) =>{
-            req.user.createOrder({orderId: order.id, status: 'PENDING'}).then(()=>{
-                res.json({order, key_id: rzp.key_id})
-            })
+        req.user.createOrder({orderId: order.id, status: 'PENDING'}).then(()=>{
+            res.json({order, key_id: rzp.key_id})
+        })
     })
 }
 
@@ -20,7 +21,7 @@ exports.updateTransactionStatus = (req, res)=>{
     Order.findOne({where: {orderId: order_id}}).then(order=>{
         order.update({paymentId: payment_id, status: 'SUCCESSFUL'}).then(()=>{
             req.user.update({isPremiumUser: true}).then(()=>{
-                return res.json({sucess: true, message: "Transaction Successful"});
+                res.json({sucess: true, message: "Transaction Successful", token: userController.generateToken(req.user.id, undefined, true)});
             })
         })
     })

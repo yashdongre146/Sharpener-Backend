@@ -3,8 +3,8 @@ const bcryptjs = require('bcryptjs')
 const jwt = require('jsonwebtoken');
 
 
-function generateToken(id){
-    return jwt.sign(id, 'secretKey')
+function generateToken(id, name, isPremiumUser){
+    return jwt.sign({id, name, isPremiumUser}, 'secretKey')
 }
 exports.signup =  (req, res) => {
    try {
@@ -22,7 +22,7 @@ exports.login = (req, res) => {
         if (user.length > 0) {
             bcryptjs.compare(req.body.password, user[0].password, (err, resp)=>{
                 if (!err) {
-                    res.json({token: generateToken(user[0].id)});
+                    res.json({token: generateToken(user[0].id, user[0].name, user[0].isPremiumUser)});
                 } else {
                     res.status(401).json();
                 }
@@ -34,3 +34,5 @@ exports.login = (req, res) => {
     })
 
 }
+
+exports.generateToken = generateToken;
