@@ -11,42 +11,53 @@ function parseJwt (token) {
     var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
     }).join(''));
-
     return JSON.parse(jsonPayload);
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-    const decodedToken = parseJwt(token);
-    if (decodedToken.isPremiumUser) {
-        document.getElementById('rzp-button').style.display = "none"
-        document.getElementById('isPremium').style.display = "block"
-    }
-    axios.get('http://localhost:3000/getExpense', {headers: {'auth': token}}).then((expenses)=>{
+window.addEventListener('DOMContentLoaded', async () => {
+    try {
+        const decodedToken = parseJwt(token);
+
+        if (decodedToken.isPremiumUser) {
+            document.getElementById('rzp-button').style.display = "none"
+            document.getElementById('isPremium').style.display = "block"
+        }
+
+        const expenses = await axios.get('http://localhost:3000/getExpense', {headers: {'auth': token}});
+
         for (let i = 0; i < expenses.data.length; i++) {
             showUserOnScreen(expenses.data[i]);
         }
-    })
+    } catch (err) {
+        console.log(err);
+    }
 })
 
-function addExpense(e){
-    e.preventDefault();
-    const expense = {
-        amount: expenseAmount.value,
-        description: chooseDescription.value,
-        category: selectCategory.value
-    }
+async function addExpense(e){
+    try {
+        e.preventDefault();
+        const expenseDetails = {
+            amount: expenseAmount.value,
+            description: chooseDescription.value,
+            category: selectCategory.value
+        }
 
-    axios.post('http://localhost:3000/addExpense', expense, {headers: {'auth': token}}).then((expense)=>{
+        await axios.post('http://localhost:3000/addExpense', expenseDetails, {headers: {'auth': token}});
         alert("Successfully added.");
-        location.reload('/')
-    })
+        location.reload('/');
+    } catch (err) {
+        console.log(err);
+    }
 }
 
-function deleteExpense(expenseId) {
-    axios.delete(`http://localhost:3000/deleteExpense/${expenseId}`).then((res)=>{
+async function deleteExpense(expenseId) {
+    try {
+        await axios.delete(`http://localhost:3000/deleteExpense/${expenseId}`, {headers: {'auth': token}})
         alert("Expense deleted")
         location.reload('/')
-    })
+    } catch (err) {
+        console.log(err);
+    }
 }
 
 function showUserOnScreen(expense){
@@ -69,45 +80,53 @@ function showUserOnScreen(expense){
         ul.remove(li);
     }
 }
+document.getElementById('rzp-button').addEventListener('click', async () => {
+    try {
+      const purchaseResponse = await axios.get('http://localhost:3000/purchase', { headers: { "auth": token } });
+      const options = {
+        "key": purchaseResponse.data.key_id,
+        "order_id": purchaseResponse.data.order.id,
+        "handler": async (res) => {
+          try {
+            const updateResponse = await axios.post('http://localhost:3000/updateTransactionStatus', {
+                order_id: options.order_id,
+                payment_id: res.razorpay_payment_id
+            }, { headers: { "auth": token } });
 
-document.getElementById('rzp-button').addEventListener('click', ()=>{
-    axios.get('http://localhost:3000/purchase', {headers: {"auth": token}})
-    .then((res)=>{
-        var options = {
-            "key": res.data.key_id,
-            "order_id": res.data.order.id,
-            "handler": function(res){
-                axios.post('http://localhost:3000/updateTransactionStatus', {
-                    order_id: options.order_id,
-                    payment_id: res.razorpay_payment_id
-                }, {headers: {"auth": token}}).then((res)=>{
-                    alert("Congrats! you are a premium member now.")
-                    document.getElementById('rzp-button').style.display = "none"
-                    document.getElementById('isPremium').style.display = "block"
-                    localStorage.setItem('token', res.data.token)
-                })
-            }
+            alert("Congrats! you are a premium member now.");
+            document.getElementById('rzp-button').style.display = "none";
+            document.getElementById('isPremium').style.display = "block";
+            localStorage.setItem('token', updateResponse.data.token);
+          } catch (error) {
+            console.error(error);
+            alert("Something went wrong");
+          }
         }
+      };
+  
+      const rzp = new Razorpay(options);
+      rzp.open();
+      rzp.on('payment.failed', (res) => {
+        console.log(res);
+        alert("Something went wrong");
+      });
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong");
+    }
+});
 
-        const rzp1 = new Razorpay(options);
-        rzp1.open();
-
-        rzp1.on('payment.faild', function(res){
-            console.log(res);
-            alert("something went wrong");
-        })
-    })
-})
-document.getElementById('showLeaderboard').addEventListener('click', ()=>{
-    axios.get('http://localhost:3000/showLeaderboard', {headers: {"auth": token}})
-    .then((res)=>{
-        res.data.forEach((result)=>{
-            const ul = document.getElementById('leaderboard');
-            const li = document.createElement('li');
-
-            li.appendChild(document.createTextNode(`Name ${result.name}, Total Expense ${result.totalAmount}`));
-
-            ul.appendChild(li);
-        })
-    })
-})
+document.getElementById('showLeaderboard').addEventListener('click', async () => {
+    try {
+      const res = await axios.get('http://localhost:3000/showLeaderboard', { headers: { "auth": token } });
+      
+      const ul = document.getElementById('leaderboard');
+      res.data.forEach((result) => {
+        const li = document.createElement('li');
+        li.appendChild(document.createTextNode(`Name ${result.name}, Total Expense ${result.totalAmount}`));
+        ul.appendChild(li);
+      });
+    } catch (error) {
+      console.error(error);
+    }
+});

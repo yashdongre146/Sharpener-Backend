@@ -17,8 +17,9 @@ exports.signup =  (req, res) => {
             res.status(400).json();
     }
 }
-exports.login = (req, res) => {
-    User.findAll({where: {email : req.body.email}}).then((user)=>{
+exports.login = async (req, res) => {
+    try {
+        const user = await User.findAll({where: {email : req.body.email}})
         if (user.length > 0) {
             bcryptjs.compare(req.body.password, user[0].password, (err, resp)=>{
                 if (!err) {
@@ -30,9 +31,9 @@ exports.login = (req, res) => {
         } else {
             res.status(401).json()
         }
-
-    })
-
+    } catch (err) {
+        res.status(500).json();
+    }
 }
 
 exports.generateToken = generateToken;

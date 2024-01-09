@@ -6,5 +6,7 @@ const router = express.Router();
 
 router.get('/purchase', userAuthentication.auth, purchaseController.purchase)
 router.post('/updateTransactionStatus', userAuthentication.auth, purchaseController.updateTransactionStatus)
+router.get('/showLeaderboard', userAuthentication.auth, purchaseController.showLeaderboard)
+
 
 module.exports = router;

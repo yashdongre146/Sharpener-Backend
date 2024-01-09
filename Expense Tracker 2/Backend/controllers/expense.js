@@ -2,34 +2,57 @@ const Expense = require("../models/expense");
 const User = require("../models/user");
 const sequelize = require("../util/database");
 
-exports.addExpense = (req, res) => {
-  const { amount, description, category } = req.body;
-  Expense.create({
-    amount: amount,
-    description: description,
-    category: category,
-    userId: req.user.id,
-  }).then((expense) => {
-    User.findByPk(req.user.id).then((user)=>{
-      const updatedAmount = user.dataValues.totalAmount+= amount;
-      req.user.update({totalAmount: updatedAmount})
-    })
-    res.json(expense)
-  });
+exports.addExpense = async (req, res) => {
+  const t = await sequelize.transaction();
+  try {
+    const { amount, description, category } = req.body;
+    const expense = await Expense.create({
+      amount: amount,
+      description: description,
+      category: category,
+      userId: req.user.id,
+    }, {transaction: t});
+
+    const user = await User.findByPk(req.user.id);
+    const updatedAmount = user.dataValues.totalAmount + parseInt(amount);
+    await req.user.update({ totalAmount: updatedAmount }, {transaction: t});
+
+    await t.commit();
+    res.json(expense);
+  } catch (err) {
+    await t.rollback();
+    res.status(500).json();
+  }
 };
 
-exports.getExpense = (req, res) => {
-  Expense.findAll({ where: { userId: req.user.id } }).then((expenses) => {
+exports.getExpense = async (req, res) => {
+  try {
+    const expenses = await Expense.findAll({ where: { userId: req.user.id } });
     res.json(expenses);
-  });
+  } catch (err) {
+    res.status(500).json();
+  }
 };
 
-exports.deleteExpense = (req, res) => {
-  Expense.destroy({ where: { id: req.params.expenseId } }).then(() => {
+exports.deleteExpense = async (req, res) => {
+  const t = await sequelize.transaction();
+  try {
+    const user = await User.findByPk(req.user.id);
+    const expense = await Expense.findByPk(req.params.expenseId);
+    const updatedAmount = user.dataValues.totalAmount - expense.amount;
+    await req.user.update({ totalAmount: updatedAmount }, {transaction: t});
+
+    await Expense.destroy({ where: { id: req.params.expenseId }, transaction: t });
+
+    await t.commit();
     res.json();
-  });
+  } catch (err) {
+    console.log(err);
+    await t.rollback();
+    res.status(500).json();
+  }
 };
-exports.showLeaderboard = async (req, res) => {
+
   /*    
 
 Promise.all([Expense.findAll(), User.findAll()]).then(([expenses, users]) => {
@@ -76,8 +99,3 @@ Promise.all([Expense.findAll(), User.findAll()]).then(([expenses, users]) => {
   // });
 
   // res.json(result);
-
-  User.findAll().then((users)=>{
-    res.json(users)
-  })
-};

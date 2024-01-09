@@ -1,6 +1,8 @@
 const Razorpay = require('razorpay');
 const Order = require('../models/order');
 const userController = require('./user');
+const User = require("../models/user");
+
 
 exports.purchase = (req, res) => {
     var rzp = new Razorpay({
@@ -14,15 +16,32 @@ exports.purchase = (req, res) => {
             res.json({order, key_id: rzp.key_id})
         })
     })
-}
+};
 
-exports.updateTransactionStatus = (req, res)=>{
-    const {payment_id, order_id} = req.body;
-    Order.findOne({where: {orderId: order_id}}).then(order=>{
-        order.update({paymentId: payment_id, status: 'SUCCESSFUL'}).then(()=>{
-            req.user.update({isPremiumUser: true}).then(()=>{
-                res.json({sucess: true, message: "Transaction Successful", token: userController.generateToken(req.user.id, undefined, true)});
-            })
-        })
-    })
-}
+exports.updateTransactionStatus = async (req, res) => {
+    try {
+      const { payment_id, order_id } = req.body;
+  
+      const order = await Order.findOne({ where: { orderId: order_id } });
+
+      await order.update({ paymentId: payment_id, status: 'SUCCESSFUL' });
+  
+      await req.user.update({ isPremiumUser: true });
+  
+      const token = userController.generateToken(req.user.id, undefined, true);
+  
+      res.json({ success: true, message: "Transaction Successful", token: token });
+    } catch (error) {
+      res.status(500).json({ success: false, error: "An error occurred while updating transaction status" });
+    }
+};
+
+exports.showLeaderboard = async (req, res) => {
+  try {
+    const users = await User.findAll();
+    res.json(users);
+  } catch (err) {
+    res.status(500).json();
+  }
+};
+  
