@@ -9,6 +9,7 @@ const sequelize = require('./util/database')
 const cors = require('cors')
 const Order = require('./models/order')
 const ForgotPassword = require('./models/forgotPassword')
+const DownloadedFile = require('./models/DownloadedFile')
 require('dotenv').config();
 
 
@@ -27,6 +28,8 @@ User.hasMany(Order);
 Order.belongsTo(User);
 User.hasMany(ForgotPassword);
 ForgotPassword.belongsTo(User);
+User.hasMany(DownloadedFile);
+DownloadedFile.belongsTo(User);
 
 sequelize.sync().then(()=>{
     app.listen(3000);

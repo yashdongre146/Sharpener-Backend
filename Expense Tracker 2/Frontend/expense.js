@@ -130,3 +130,60 @@ document.getElementById('showLeaderboard').addEventListener('click', async () =>
       console.error(error);
     }
 });
+document.getElementById('showHistory').addEventListener('click', async () => {
+    try {
+      const res = await axios.get('http://localhost:3000/showHistory', { headers: { "auth": token } });
+
+      const table = document.getElementById('table');
+      const caption = document.createElement('caption');
+      caption.appendChild(document.createTextNode("Show History"))
+
+      for (const file of res.data) {
+        // converting into local date string
+        const newDate = new Date(file.updatedAt);
+        const options = {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: true
+        };
+      
+        const formattedDate = newDate.toLocaleDateString('en-US', options);
+      
+        const a = document.createElement('a');
+        a.appendChild(document.createTextNode(formattedDate));
+        a.href = file.fileUrl;
+        a.download = formattedDate;
+      
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        
+        td.appendChild(a);
+        tr.appendChild(td);
+        table.appendChild(caption);
+        table.appendChild(tr);
+      }
+      
+
+    } catch (error) {
+      alert("Something went wrong")
+    }
+});
+document.getElementById('download').addEventListener('click', async () => {
+  try {
+    const res = await axios.get('http://localhost:3000/download', {
+        headers: { "auth": token }
+    });
+
+    const a = document.createElement('a');
+    a.href = res.data.fileUrl;
+    a.download = 'myExpenses.csv';
+
+    a.click();
+  } catch (err) {
+    alert("Something went wrong!")
+  }
+});

@@ -1,8 +1,39 @@
 const Razorpay = require('razorpay');
 const Order = require('../models/order');
 const userController = require('./user');
+const Expense = require("../models/expense");
 const User = require("../models/user");
+const AWS = require('aws-sdk')
 
+function uploadToS3(data, filename){
+  const BUCKET_NAME = 'expense-tracker2';
+  const IAM_USER_KEY = 'AKIA2TCMBIZJQIWSOLE5';
+  const IAM_USER_SECRET = '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';
+
+  let s3Bucket = new AWS.S3({
+    accessKeyId: IAM_USER_KEY,
+    secretAccessKey: IAM_USER_SECRET
+  })
+
+  var params = {
+    Bucket: BUCKET_NAME,
+    Key: filename,
+    Body: data,
+    ACL: 'public-read'
+  }
+  return new Promise((resolve, reject)=>{
+      s3Bucket.upload(params, (err, s3response)=>{
+      if (err) {
+        console.log("Went wrong", err);
+        reject(err);
+      } else {
+        console.log("Success", s3response);
+        resolve(s3response.Location);
+      }
+    })
+  })
+  
+}
 
 exports.purchase = (req, res) => {
     var rzp = new Razorpay({
@@ -42,6 +73,33 @@ exports.showLeaderboard = async (req, res) => {
     res.json(users);
   } catch (err) {
     res.status(500).json();
+  }
+};
+
+exports.download = async (req, res) => {
+  try{
+      const expenses = await Expense.findAll({where: {userId: req.user.id}});
+      const stringifiedExpenses = JSON.stringify(expenses);
+      const filename = `Expense${req.user.id}/${new Date()}.txt`;
+      const fileUrl = await uploadToS3(stringifiedExpenses, filename)
+      await req.user.createDownloadedFile({fileUrl});
+      res.json({fileUrl, success: true})
+  }
+  catch(err){
+      console.log(err);
+      res.status(500).json()
+  }
+ 
+};
+
+exports.showHistory = async (req, res) => {
+    try{
+      const files = await req.user.getDownloadedFiles({attributes: ['fileUrl', 'updatedAt']});
+      return res.status(200).json(files);
+  }
+  catch(err){
+      console.log(err);
+      res.status(500).json({fileUrl: '', success:false, error:err});
   }
 };
   
