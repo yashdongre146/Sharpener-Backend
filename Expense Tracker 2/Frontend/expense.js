@@ -23,8 +23,10 @@ window.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('rzp-button').style.display = "none"
             document.getElementById('isPremium').style.display = "block"
         }
+        const limit = localStorage.getItem('limit') || 10;
 
-        const res = await axios.get('http://localhost:3000/getExpense?page=1', {headers: {'auth': token}});
+
+        const res = await axios.get(`http://localhost:3000/getExpense?page=1&limit=${limit}`, {headers: {'auth': token}});
         
         for (let i = 0; i < res.data.expenses.length; i++) {
           showUserOnScreen(res.data.expenses[i]);
@@ -206,7 +208,9 @@ function showPagignation(pageData) {
 }
 async function getExpenses(page) {
   try {
-    const res = await axios.get(`http://localhost:3000/getExpense?page=${page}`,
+    const limit = localStorage.getItem('limit') || 10;
+
+    const res = await axios.get(`http://localhost:3000/getExpense?page=${page}&limit=${limit}`,
         { headers: { "auth": token } });
 
     ul.innerHTML = '';
@@ -218,4 +222,26 @@ async function getExpenses(page) {
   catch (err) {
       alert(err.res.data.message)
   }
+}
+
+async function updateRows(e) {
+  try {
+      const limit = e.target.value;
+      localStorage.setItem('limit', limit);
+
+      const response = await axios.get(`expense/get-expenses?page=1&limit=${limit}`,
+          { headers: { "Authorization": token } });
+
+   
+      tbody.innerHTML = '';
+      for (let i = 0; i < response.data.expenses.length; i++) {
+          showOnScreen(response.data.expenses[i]);
+      }
+     
+      showPagination(response.data)
+  }
+  catch (err) {
+      alert(err.response.data.message)
+  }
+
 }

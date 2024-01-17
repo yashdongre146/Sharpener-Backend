@@ -27,7 +27,7 @@ exports.addExpense = async (req, res) => {
 
 exports.getExpense = async (req, res) => {
   const page = parseInt(req.query.page);
-  const limit = 5;
+  const limit = parseInt(req.query.limit);
   const offset = (page - 1) * limit;
   try {
     const expenses = await Expense.findAll({
