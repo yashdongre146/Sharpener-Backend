@@ -26,11 +26,34 @@ exports.addExpense = async (req, res) => {
 };
 
 exports.getExpense = async (req, res) => {
+  const page = parseInt(req.query.page);
+  const limit = 5;
+  const offset = (page - 1) * limit;
   try {
-    const expenses = await Expense.findAll({ where: { userId: req.user.id } });
-    res.json(expenses);
+    const expenses = await Expense.findAll({
+      where: { userId: req.user.id },
+      offset: offset,
+      limit: limit,
+    });
+
+    const count = await Expense.count();
+
+    const hasMoreData = count - (page-1)*limit > limit ? true : false;
+    const nextPage = hasMoreData ? Number(page) + 1 : undefined;
+    const previousPage = page > 1 ? Number(page)-1 : undefined;
+    const hasPreviousPage = previousPage ? true : false;
+
+    res.status(200).json(
+        {
+            expenses: expenses,
+            hasNextPage: hasMoreData,
+            hasPreviousPage: hasPreviousPage,
+            previousPage: previousPage,
+            nextPage: nextPage
+        })
   } catch (err) {
-    res.status(500).json();
+    console.log(err)
+    res.status(500).json({ message: 'Internal server error' })
   }
 };
 

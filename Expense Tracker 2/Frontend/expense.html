@@ -29,13 +29,15 @@
       <input type="submit" value="Add Expense" />
     </form>
     <button id="rzp-button">Buy Premium</button>
-    <div id="isPremium" style="display: block">
+    <div id="isPremium" style="display: none">
       <span>You are a premium user</span>
       <button id="showLeaderboard">Show Leaderboard</button>
       <button id="download">Download</button>
       <button id="showHistory">Show History</button>
     </div>
     <ul id="list"></ul>
+    <button id="prev" disabled>Prev</button>
+    <button id="next" disabled>Next</button>
     <ul id="leaderboard"></ul>
     <table id="table"></table>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>

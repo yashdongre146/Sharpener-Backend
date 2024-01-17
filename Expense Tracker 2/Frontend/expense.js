@@ -2,8 +2,9 @@ const expenseAmount = document.getElementById('expenseamount');
 const chooseDescription = document.getElementById('choosedescription');
 const selectCategory = document.getElementById('selectcategory');
 const form = document.getElementById('form');
-const items = document.getElementById('items');
 const token = localStorage.getItem('token');
+const ul = document.getElementById('list');
+
 
 function parseJwt (token) {
     var base64Url = token.split('.')[1];
@@ -23,11 +24,13 @@ window.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('isPremium').style.display = "block"
         }
 
-        const expenses = await axios.get('http://localhost:3000/getExpense', {headers: {'auth': token}});
-
-        for (let i = 0; i < expenses.data.length; i++) {
-            showUserOnScreen(expenses.data[i]);
+        const res = await axios.get('http://localhost:3000/getExpense?page=1', {headers: {'auth': token}});
+        
+        for (let i = 0; i < res.data.expenses.length; i++) {
+          showUserOnScreen(res.data.expenses[i]);
         }
+
+        showPagignation(res.data)
     } catch (err) {
         console.log(err);
     }
@@ -61,7 +64,6 @@ async function deleteExpense(expenseId) {
 }
 
 function showUserOnScreen(expense){
-    const ul = document.getElementById('list');
     const li = document.createElement('li');
 
     li.appendChild(document.createTextNode(`${expense.amount} - ${expense.description} - ${expense.category} `));
@@ -187,3 +189,33 @@ document.getElementById('download').addEventListener('click', async () => {
     alert("Something went wrong!")
   }
 });
+
+function showPagignation(pageData) {
+  if (pageData.hasNextPage) {
+    document.getElementById('next').removeAttribute('disabled');
+    document.getElementById('next').addEventListener('click', () => getExpenses(pageData.nextPage));
+  }else{
+      document.getElementById('next').setAttribute('disabled', 'true');
+  }
+  if (pageData.hasPreviousPage) {
+    document.getElementById('prev').removeAttribute('disabled');
+    document.getElementById('prev').addEventListener('click', () => getExpenses(pageData.previousPage));
+  }else{
+    document.getElementById('prev').setAttribute('disabled', 'true');
+  }
+}
+async function getExpenses(page) {
+  try {
+    const res = await axios.get(`http://localhost:3000/getExpense?page=${page}`,
+        { headers: { "auth": token } });
+
+    ul.innerHTML = '';
+    for (let i = 0; i < res.data.expenses.length; i++) {
+      showUserOnScreen(res.data.expenses[i]);
+    }
+    showPagignation(res.data)
+  }
+  catch (err) {
+      alert(err.res.data.message)
+  }
+}
