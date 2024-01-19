@@ -7,7 +7,7 @@ const { v4: uuidv4, v5: uuidv5 } = require('uuid')
 const Sib = require('sib-api-v3-sdk');
 
 function generateToken(id, name, isPremiumUser){
-    return jwt.sign({id, name, isPremiumUser}, 'secretKey')
+    return jwt.sign({id, name, isPremiumUser}, process.env.JWT_SECRET)
 }
 
 exports.signup =  (req, res) => {
@@ -53,6 +53,7 @@ exports.forgotPassword = async (req, res) => {
 
             const apiKey = client.authentications['api-key'];
             apiKey.apiKey = process.env.SIB_KEY;
+
 
             const tranEmailApi = new Sib.TransactionalEmailsApi();
 

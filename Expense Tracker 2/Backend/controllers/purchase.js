@@ -6,9 +6,9 @@ const User = require("../models/user");
 const AWS = require('aws-sdk')
 
 function uploadToS3(data, filename){
-  const BUCKET_NAME = 'expense-tracker2';
-  const IAM_USER_KEY = 'AKIA2TCMBIZJQIWSOLE5';
-  const IAM_USER_SECRET = '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';
+  const BUCKET_NAME = process.env.S3_BUCKET_NAME;
+  const IAM_USER_KEY = process.env.IAM_USER_KEY;
+  const IAM_USER_SECRET = process.env.IAM_USER_SECRET;
 
   let s3Bucket = new AWS.S3({
     accessKeyId: IAM_USER_KEY,
@@ -36,17 +36,21 @@ function uploadToS3(data, filename){
 }
 
 exports.purchase = (req, res) => {
-    var rzp = new Razorpay({
-        key_id: process.env.RAZORPAY_KEY_ID,
-        key_secret: process.env.RAZORPAY_KEY_SECRET
-    })
-    const amount = 2500;
+    try {
+      var rzp = new Razorpay({
+          key_id: `${process.env.RAZORPAY_KEY_ID}`,
+          key_secret: `${process.env.RAZORPAY_KEY_SECRET}`
+      })
+      const amount = 2500;
 
-    rzp.orders.create({amount, currency: 'INR'}, (err, order) =>{
-        req.user.createOrder({orderId: order.id, status: 'PENDING'}).then(()=>{
-            res.json({order, key_id: rzp.key_id})
-        })
-    })
+      rzp.orders.create({amount, currency: 'INR'}, (err, order) =>{
+          req.user.createOrder({orderId: order.id, status: 'PENDING'}).then(()=>{
+              res.json({order, key_id: rzp.key_id})
+          })
+      })
+    } catch (err) {
+      res.status(500).json();
+    }
 };
 
 exports.updateTransactionStatus = async (req, res) => {

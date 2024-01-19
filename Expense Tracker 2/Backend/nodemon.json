@@ -1,0 +1,16 @@
+{
+    "env": {
+        "S3_BUCKET_NAME": "expense-tracker2",
+        "IAM_USER_KEY": "AKIA2TCMBIZJQIWSOLE5",
+        "IAM_USER_SECRET": "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",
+        "RAZORPAY_KEY_ID": "rzp_test_fISQwaRfSwGEQm",
+        "RAZORPAY_KEY_SECRET": "cro480uZvKBCj4pau8FrXj5Q",
+        "JWT_SECRET": "secretKey",
+        "WEBSITE": "http://localhost:3000",
+        "SIB_KEY": "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",
+        "SQL_DB_NAME": "expense-tracker2",
+        "SQL_DB_USER": "root",
+        "SQL_DB_PASSWORD": "Clashofclans@02",
+        "SQL_DB_HOST": "localhost"
+    }
+}

@@ -1,10 +1,8 @@
 const expenseAmount = document.getElementById('expenseamount');
 const chooseDescription = document.getElementById('choosedescription');
 const selectCategory = document.getElementById('selectcategory');
-const form = document.getElementById('form');
 const token = localStorage.getItem('token');
 const ul = document.getElementById('list');
-
 
 function parseJwt (token) {
     var base64Url = token.split('.')[1];
@@ -14,7 +12,6 @@ function parseJwt (token) {
     }).join(''));
     return JSON.parse(jsonPayload);
 }
-
 window.addEventListener('DOMContentLoaded', async () => {
     try {
         const decodedToken = parseJwt(token);
@@ -24,12 +21,11 @@ window.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('isPremium').style.display = "block"
         }
         const limit = localStorage.getItem('limit') || 10;
-
-
+        
         const res = await axios.get(`http://localhost:3000/getExpense?page=1&limit=${limit}`, {headers: {'auth': token}});
         
         for (let i = 0; i < res.data.expenses.length; i++) {
-          showUserOnScreen(res.data.expenses[i]);
+          showOnScreen(res.data.expenses[i]);
         }
 
         showPagignation(res.data)
@@ -37,7 +33,6 @@ window.addEventListener('DOMContentLoaded', async () => {
         console.log(err);
     }
 })
-
 async function addExpense(e){
     try {
         e.preventDefault();
@@ -54,7 +49,6 @@ async function addExpense(e){
         console.log(err);
     }
 }
-
 async function deleteExpense(expenseId) {
     try {
         await axios.delete(`http://localhost:3000/deleteExpense/${expenseId}`, {headers: {'auth': token}})
@@ -64,8 +58,7 @@ async function deleteExpense(expenseId) {
         console.log(err);
     }
 }
-
-function showUserOnScreen(expense){
+function showOnScreen(expense){
     const li = document.createElement('li');
 
     li.appendChild(document.createTextNode(`${expense.amount} - ${expense.description} - ${expense.category} `));
@@ -119,7 +112,6 @@ document.getElementById('rzp-button').addEventListener('click', async () => {
       alert("Something went wrong");
     }
 });
-
 document.getElementById('showLeaderboard').addEventListener('click', async () => {
     try {
       const res = await axios.get('http://localhost:3000/showLeaderboard', { headers: { "auth": token } });
@@ -191,7 +183,6 @@ document.getElementById('download').addEventListener('click', async () => {
     alert("Something went wrong!")
   }
 });
-
 function showPagignation(pageData) {
   if (pageData.hasNextPage) {
     document.getElementById('next').removeAttribute('disabled');
@@ -215,7 +206,7 @@ async function getExpenses(page) {
 
     ul.innerHTML = '';
     for (let i = 0; i < res.data.expenses.length; i++) {
-      showUserOnScreen(res.data.expenses[i]);
+      showOnScreen(res.data.expenses[i]);
     }
     showPagignation(res.data)
   }
@@ -223,25 +214,13 @@ async function getExpenses(page) {
       alert(err.res.data.message)
   }
 }
-
 async function updateRows(e) {
   try {
       const limit = e.target.value;
       localStorage.setItem('limit', limit);
-
-      const response = await axios.get(`expense/get-expenses?page=1&limit=${limit}`,
-          { headers: { "Authorization": token } });
-
-   
-      tbody.innerHTML = '';
-      for (let i = 0; i < response.data.expenses.length; i++) {
-          showOnScreen(response.data.expenses[i]);
-      }
-     
-      showPagination(response.data)
+      location.reload('/')
   }
   catch (err) {
-      alert(err.response.data.message)
+      alert("Something went wrong")
   }
-
 }

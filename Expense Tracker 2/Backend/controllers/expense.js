@@ -36,8 +36,7 @@ exports.getExpense = async (req, res) => {
       limit: limit,
     });
 
-    const count = await Expense.count();
-
+    const count = await Expense.count({where: {userId: req.user.id}});
     const hasMoreData = count - (page-1)*limit > limit ? true : false;
     const nextPage = hasMoreData ? Number(page) + 1 : undefined;
     const previousPage = page > 1 ? Number(page)-1 : undefined;
